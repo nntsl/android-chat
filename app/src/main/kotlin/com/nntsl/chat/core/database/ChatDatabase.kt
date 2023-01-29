@@ -11,7 +11,8 @@ import com.nntsl.chat.core.database.util.InstantConverter
     entities = [
         MessageEntity::class
     ],
-    version = 1
+    version = 1,
+    exportSchema = true
 )
 @TypeConverters(
     InstantConverter::class

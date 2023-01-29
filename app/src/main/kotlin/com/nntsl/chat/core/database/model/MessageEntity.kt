@@ -8,17 +8,23 @@ import kotlinx.datetime.Instant
 
 @Entity(tableName = "messages")
 data class MessageEntity(
-    @PrimaryKey
-    val id: String,
     val content: String,
     @ColumnInfo(name = "message_date")
     val messageDate: Instant,
     val isUserMessage: Boolean
-)
+) {
+    @PrimaryKey(autoGenerate = true)
+    var id: Int = 0
+}
 
 fun MessageEntity.asExternalModel() = Message(
-    id = id,
     content = content,
     date = messageDate,
+    isUserMessage = isUserMessage
+)
+
+fun Message.asEntity() = MessageEntity(
+    content = content,
+    messageDate = date,
     isUserMessage = isUserMessage
 )

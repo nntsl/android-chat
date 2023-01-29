@@ -6,4 +6,6 @@ import kotlinx.coroutines.flow.Flow
 interface MessagesRepository {
 
     val messages: Flow<List<Message>>
+
+    suspend fun insertMessage(message: Message)
 }

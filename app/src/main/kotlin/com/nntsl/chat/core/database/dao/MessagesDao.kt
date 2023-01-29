@@ -10,9 +10,12 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface MessagesDao {
 
-    @Query(value = "SELECT * FROM messages")
+    @Query(value = "SELECT * FROM messages ORDER BY message_date DESC")
     fun getMessages(): Flow<List<MessageEntity>>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertOrIgnoreMessages(entities: List<MessageEntity>): List<Long>
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertMessage(entity: MessageEntity)
 }
