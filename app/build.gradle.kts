@@ -64,6 +64,7 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.lifecycle.runtimeCompose)
     implementation(libs.androidx.compose.navigation)
+    implementation(libs.coil.kt.compose)
 
     implementation(libs.hilt.android)
     kapt(libs.hilt.compiler)

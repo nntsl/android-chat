@@ -2,15 +2,13 @@ package com.nntsl.chat.feature.chat
 
 import android.app.Activity
 import androidx.compose.animation.*
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.KeyboardArrowLeft
 import androidx.compose.material.icons.rounded.MoreVert
-import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -25,6 +23,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -33,6 +32,8 @@ import androidx.compose.ui.unit.dp
 import androidx.core.view.doOnPreDraw
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.nntsl.chat.R.string
 import com.nntsl.chat.core.model.Message
 import com.nntsl.chat.core.util.currentTime
@@ -49,7 +50,8 @@ fun ChatRoute(onBackClick: () -> Unit, viewModel: ChatViewModel = hiltViewModel(
         uiState = uiState,
         modifier = Modifier,
         addMessage = viewModel::addMessage,
-        otherUserName = "Sarah"
+        otherUserName = "Sarah",
+        otherUserPhoto = "https://www.shutterstock.com/image-photo/happy-young-woman-sitting-on-260nw-2018571389.jpg"
     )
 }
 
@@ -59,7 +61,8 @@ fun ChatScreen(
     uiState: ChatUiState,
     addMessage: (Message) -> Unit,
     modifier: Modifier,
-    otherUserName: String
+    otherUserName: String,
+    otherUserPhoto: String
 ) {
     val loading = uiState.isLoading
 
@@ -73,11 +76,11 @@ fun ChatScreen(
 
     Box(modifier = modifier.fillMaxSize()) {
         ChatContent(
-            onBackClick = onBackClick,
-            modifier = modifier,
             uiState = uiState,
+            otherUserName = otherUserName,
+            otherUserPhoto = otherUserPhoto,
             addMessage = addMessage,
-            otherUserName = otherUserName
+            onBackClick = onBackClick
         )
     }
 
@@ -108,7 +111,8 @@ fun ChatScreen(
 @Composable
 fun ChatHeader(
     onBackClick: () -> Unit,
-    name: String
+    name: String,
+    photo: String
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -122,16 +126,22 @@ fun ChatHeader(
             onClick = { onBackClick() },
         ) {
             Icon(
-                imageVector = Icons.Rounded.ArrowBack,
+                imageVector = Icons.Rounded.KeyboardArrowLeft,
                 contentDescription = "chat:back",
                 tint = MaterialTheme.colorScheme.primary
             )
         }
-        Image(
-            imageVector = Icons.Rounded.Person,
+        AsyncImage(
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(photo)
+                .allowHardware(false)
+                .crossfade(true)
+                .build(),
             contentDescription = "chat:avatar",
             contentScale = ContentScale.Crop,
-            modifier = Modifier.clip(CircleShape)
+            modifier = Modifier
+                .clip(CircleShape)
+                .size(40.dp)
         )
         Spacer(Modifier.width(16.dp))
         Text(
@@ -147,7 +157,7 @@ fun ChatHeader(
                 imageVector = Icons.Rounded.MoreVert,
                 contentDescription = "chat:menu",
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.rotate(180f)
+                modifier = Modifier.rotate(90f)
             )
         }
     }
@@ -157,7 +167,7 @@ fun ChatHeader(
 private fun ChatContent(
     uiState: ChatUiState,
     otherUserName: String,
-    modifier: Modifier = Modifier,
+    otherUserPhoto: String,
     addMessage: (Message) -> Unit,
     onBackClick: () -> Unit
 ) {
@@ -165,7 +175,11 @@ private fun ChatContent(
     val scrollState = rememberLazyListState()
 
     Column(modifier = Modifier.fillMaxSize()) {
-        ChatHeader(onBackClick = onBackClick, name = otherUserName)
+        ChatHeader(
+            onBackClick = onBackClick,
+            name = otherUserName,
+            photo = otherUserPhoto
+        )
         Box(
             modifier = Modifier
                 .height(8.dp)
@@ -226,15 +240,7 @@ private fun ChatContent(
                 scope.launch {
                     scrollState.scrollToItem(0)
                 }
-            },
-            modifier = Modifier
-//                .windowInsetsPadding(
-//                    WindowInsets.safeDrawing.only(
-//                        WindowInsetsSides.Bottom
-//                    )
-//                )
-//                .navigationBarsPadding()
-//                .imePadding()
+            }
         )
     }
 }
