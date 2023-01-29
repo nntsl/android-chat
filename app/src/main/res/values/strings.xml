@@ -1,5 +1,5 @@
 <resources>
     <string name="app_name">Chat</string>
     <string name="messages_loading">Loading…</string>
-    <string name="empty_header">No available data</string>
+    <string name="empty_header">No messages yet</string>
 </resources>

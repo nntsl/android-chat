@@ -3,61 +3,45 @@ package com.nntsl.chat.feature.chat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nntsl.chat.core.domain.GetMessagesUseCase
+import com.nntsl.chat.core.domain.SendMessageUseCase
 import com.nntsl.chat.core.model.Message
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class ChatViewModel @Inject constructor(
-    private val getMessagesUseCase: GetMessagesUseCase
+    getMessagesUseCase: GetMessagesUseCase,
+    private val sendMessageUseCase: SendMessageUseCase
 ) : ViewModel() {
 
-    private val viewModelState = MutableStateFlow(ChatViewModelState(isLoading = true))
-
     val chatUiState: StateFlow<ChatUiState> =
-        viewModelState
-            .map(ChatViewModelState::toUiState)
+        getMessagesUseCase()
+            .map {
+                ChatUiState.Success(isLoading = false, messages = it)
+            }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(5_000),
-                initialValue = viewModelState.value.toUiState()
+                initialValue = ChatUiState.NoData(isLoading = true, messages = listOf())
             )
 
-    init {
-        refresh()
-    }
-
-    private fun refresh() {
-        viewModelState.update { it.copy(isLoading = true) }
-
+    fun addMessage(message: Message) {
         viewModelScope.launch {
-            getMessagesUseCase()
+            sendMessageUseCase.invoke(message)
         }
     }
 }
 
 sealed interface ChatUiState {
     val isLoading: Boolean
+    val messages: List<Message>
 
-    data class Success(override val isLoading: Boolean, val messages: List<Message>) : ChatUiState
+    data class Success(override val isLoading: Boolean, override val messages: List<Message>) : ChatUiState
 
-    data class NoData(override val isLoading: Boolean) : ChatUiState
-}
-
-private data class ChatViewModelState(
-    val isLoading: Boolean = false,
-    val messages: List<Message> = listOf()
-) {
-    fun toUiState(): ChatUiState {
-        return if (messages.isEmpty()) {
-            ChatUiState.NoData(isLoading = false)
-        } else {
-            ChatUiState.Success(
-                isLoading = isLoading,
-                messages = messages
-            )
-        }
-    }
+    data class NoData(override val isLoading: Boolean, override val messages: List<Message>) : ChatUiState
 }

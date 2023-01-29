@@ -19,8 +19,8 @@ import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
-import com.nntsl.chat.designsystem.util.NUM_OF_LINES
-import com.nntsl.chat.designsystem.util.ROTATION_TIME
+import com.nntsl.chat.designsystem.util.LOADING_NUM_OF_LINES
+import com.nntsl.chat.designsystem.util.LOADING_ROTATION_TIME
 import kotlinx.coroutines.launch
 
 @Composable
@@ -31,9 +31,9 @@ fun ChatLoadingWheel(
     val infiniteTransition = rememberInfiniteTransition()
 
     val startValue = if (LocalInspectionMode.current) 0F else 1F
-    val floatAnimValues = (0 until NUM_OF_LINES).map { remember { Animatable(startValue) } }
+    val floatAnimValues = (0 until LOADING_NUM_OF_LINES).map { remember { Animatable(startValue) } }
     LaunchedEffect(floatAnimValues) {
-        (0 until NUM_OF_LINES).map { index ->
+        (0 until LOADING_NUM_OF_LINES).map { index ->
             launch {
                 floatAnimValues[index].animateTo(
                     targetValue = 0F,
@@ -51,24 +51,24 @@ fun ChatLoadingWheel(
         initialValue = 0F,
         targetValue = 360F,
         animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = ROTATION_TIME, easing = LinearEasing)
+            animation = tween(durationMillis = LOADING_ROTATION_TIME, easing = LinearEasing)
         )
     )
 
     val baseLineColor = MaterialTheme.colorScheme.onBackground
     val progressLineColor = MaterialTheme.colorScheme.inversePrimary
-    val colorAnimValues = (0 until NUM_OF_LINES).map { index ->
+    val colorAnimValues = (0 until LOADING_NUM_OF_LINES).map { index ->
         infiniteTransition.animateColor(
             initialValue = baseLineColor,
             targetValue = baseLineColor,
             animationSpec = infiniteRepeatable(
                 animation = keyframes {
-                    durationMillis = ROTATION_TIME / 2
-                    progressLineColor at ROTATION_TIME / NUM_OF_LINES / 2 with LinearEasing
-                    baseLineColor at ROTATION_TIME / NUM_OF_LINES with LinearEasing
+                    durationMillis = LOADING_ROTATION_TIME / 2
+                    progressLineColor at LOADING_ROTATION_TIME / LOADING_NUM_OF_LINES / 2 with LinearEasing
+                    baseLineColor at LOADING_ROTATION_TIME / LOADING_NUM_OF_LINES with LinearEasing
                 },
                 repeatMode = RepeatMode.Restart,
-                initialStartOffset = StartOffset(ROTATION_TIME / NUM_OF_LINES / 2 * index)
+                initialStartOffset = StartOffset(LOADING_ROTATION_TIME / LOADING_NUM_OF_LINES / 2 * index)
             )
         )
     }
@@ -80,7 +80,7 @@ fun ChatLoadingWheel(
             .graphicsLayer { rotationZ = rotationAnim }
             .semantics { contentDescription = contentDesc }
     ) {
-        repeat(NUM_OF_LINES) { index ->
+        repeat(LOADING_NUM_OF_LINES) { index ->
             rotate(degrees = index * 30f) {
                 drawLine(
                     color = colorAnimValues[index].value,
