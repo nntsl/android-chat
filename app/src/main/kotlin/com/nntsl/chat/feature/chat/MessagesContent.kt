@@ -1,5 +1,6 @@
 package com.nntsl.chat.feature.chat
 
+import androidx.annotation.VisibleForTesting
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
@@ -28,7 +29,7 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
 @Composable
-fun Messages(
+fun MessagesContent(
     messages: List<Message>,
     modifier: Modifier = Modifier,
     scrollState: LazyListState,
@@ -48,11 +49,6 @@ fun Messages(
             for (index in messages.indices) {
                 val content = messages[index]
 
-                val sameDay = if (index < messages.size - 1) {
-                    isTheSameDay(messages[index + 1].date, messages[index].date)
-                } else {
-                    index == 0
-                }
                 item {
                     Message(
                         message = content,
@@ -60,7 +56,7 @@ fun Messages(
                         showTail = shouldShowMessageTail(messages, index)
                     )
                 }
-                if (!sameDay) {
+                if (shouldShowSectionTitle(messages, index)) {
                     item {
                         Timestamp(content)
                     }
@@ -198,6 +194,7 @@ private fun getBubbleShape(isUserMessage: Boolean, showTail: Boolean): Shape {
 }
 
 // Returns message date with format “{day} {timestamp}” (Thursday 11:59).
+// If date is more than a week ago, format would be ”MMM d h:mm” (Jan 30 10:00)
 @Composable
 private fun dateFormatted(publishDate: Instant): String {
     val pattern = if (isTheSameWeek(publishDate)) "EEEE h:mm" else "MMM d h:mm"
@@ -207,7 +204,8 @@ private fun dateFormatted(publishDate: Instant): String {
 }
 
 // Shows tail when any of the 3 criteria are met
-private fun shouldShowMessageTail(messages: List<Message>, index: Int): Boolean {
+@VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+fun shouldShowMessageTail(messages: List<Message>, index: Int): Boolean {
     val showTail = if (index == 0) {
         true
     } else {
@@ -216,6 +214,15 @@ private fun shouldShowMessageTail(messages: List<Message>, index: Int): Boolean 
                 || (!messages[index - 1].isUserMessage && messages[index].isUserMessage)
     }
     return showTail
+}
+
+@VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+fun shouldShowSectionTitle(messages: List<Message>, index: Int): Boolean {
+    return if (index < messages.size - 1) {
+        !isTheSameDay(messages[index + 1].date, messages[index].date)
+    } else {
+        true
+    }
 }
 
 private val JumpToBottomThreshold = 56.dp

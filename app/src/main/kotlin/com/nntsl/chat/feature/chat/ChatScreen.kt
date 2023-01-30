@@ -203,7 +203,7 @@ private fun ChatContent(
                 style = MaterialTheme.typography.bodyMedium
             )
         }
-        Messages(
+        MessagesContent(
             messages = uiState.messages,
             modifier = Modifier.weight(1f),
             scrollState = scrollState,

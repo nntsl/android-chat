@@ -75,6 +75,12 @@ dependencies {
     kapt(libs.room.compiler)
     implementation(libs.kotlinx.datetime)
     implementation(platform(libs.kotlin.bom))
+
+    api(libs.junit4)
+    api(libs.androidx.test.core)
+    api(libs.kotlinx.coroutines.test)
+    testImplementation(kotlin("test"))
+    testImplementation(libs.junit.params)
 }
 
 kapt {

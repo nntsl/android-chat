@@ -18,6 +18,10 @@ room = "2.5.0"
 kotlinxDatetime = "0.4.0"
 kotlinBom = "1.8.0"
 coil = "2.2.2"
+androidxTestCore = "1.5.0"
+junit4 = "4.13.2"
+kotlinxCoroutines = "1.6.4"
+junitParams = "1.1.1"
 
 [libraries]
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "androidxActivity" }
@@ -37,6 +41,10 @@ kotlinx-datetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime",
 kotlin-bom = { group = "org.jetbrains.kotlin", name = "kotlin-bom", version.ref = "kotlinBom" }
 androidx-hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "androidxHiltNavigationCompose" }
 coil-kt-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil"}
+junit4 = { group = "junit", name = "junit", version.ref = "junit4" }
+androidx-test-core = { group = "androidx.test", name = "core", version.ref = "androidxTestCore" }
+kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlinxCoroutines" }
+junit-params = { group = "pl.pragmatists", name = "JUnitParams", version.ref = "junitParams" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
