@@ -1,6 +1,6 @@
 package com.nntsl.chat.core.data.di
 
-import com.nntsl.chat.core.data.MessagesRepository
+import com.nntsl.chat.core.datainfrustructure.MessagesRepository
 import com.nntsl.chat.core.data.OfflineFirstMessagesRepository
 import dagger.Binds
 import dagger.Module

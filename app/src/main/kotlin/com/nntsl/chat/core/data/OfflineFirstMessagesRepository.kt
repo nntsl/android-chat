@@ -4,6 +4,7 @@ import com.nntsl.chat.core.database.dao.MessagesDao
 import com.nntsl.chat.core.database.model.MessageEntity
 import com.nntsl.chat.core.database.model.asEntity
 import com.nntsl.chat.core.database.model.asExternalModel
+import com.nntsl.chat.core.datainfrustructure.MessagesRepository
 import com.nntsl.chat.core.model.Message
 import com.nntsl.chat.core.util.currentTime
 import kotlinx.coroutines.flow.Flow

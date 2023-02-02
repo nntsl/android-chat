@@ -1,12 +1,13 @@
 package com.nntsl.chat
 
+import com.nntsl.chat.core.data.TestMessagesRepository
 import com.nntsl.chat.core.domain.GetMessagesUseCase
 import com.nntsl.chat.core.domain.SendMessageUseCase
 import com.nntsl.chat.core.model.Message
-import com.nntsl.chat.core.testing.TestMessagesRepository
-import com.nntsl.chat.core.testing.util.MainDispatcherRule
+import com.nntsl.chat.core.util.MainDispatcherRule
 import com.nntsl.chat.feature.chat.ChatUiState
 import com.nntsl.chat.feature.chat.ChatViewModel
+import com.nntsl.chat.feature.chat.model.mapToMessageScreenItems
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -58,7 +59,7 @@ class ChatViewModelTest {
         assertEquals(
             ChatUiState.Success(
                 isLoading = false,
-                messages = testMessageList
+                messages = testMessageList.mapToMessageScreenItems()
             ),
             viewModel.chatUiState.value
         )
@@ -71,7 +72,7 @@ class ChatViewModelTest {
         val collectJob = launch(UnconfinedTestDispatcher()) { viewModel.chatUiState.collect() }
 
         val message = Message(
-            content = "4",
+            content = "Test message 8",
             Instant.parse("2023-01-30T09:30:00.000Z"),
             isUserMessage = true
         )
@@ -82,7 +83,7 @@ class ChatViewModelTest {
         assertEquals(
             ChatUiState.Success(
                 isLoading = false,
-                messages = testMessageList.plus(message)
+                messages = testMessageList.plus(message).mapToMessageScreenItems()
             ),
             viewModel.chatUiState.value
         )

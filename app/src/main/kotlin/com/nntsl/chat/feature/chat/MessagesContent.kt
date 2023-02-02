@@ -1,6 +1,5 @@
 package com.nntsl.chat.feature.chat
 
-import androidx.annotation.VisibleForTesting
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
@@ -12,25 +11,21 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
-import com.nntsl.chat.core.model.Message
-import com.nntsl.chat.core.util.isDifferenceInSecMore
-import com.nntsl.chat.core.util.isTheSameDay
-import com.nntsl.chat.core.util.isTheSameWeek
 import com.nntsl.chat.designsystem.util.MESSAGE_PADDING
-import kotlinx.datetime.Instant
-import kotlinx.datetime.toJavaInstant
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
+import com.nntsl.chat.feature.chat.model.MessageScreenItem
 
 @Composable
 fun MessagesContent(
-    messages: List<Message>,
+    messages: List<MessageScreenItem>,
     modifier: Modifier = Modifier,
     scrollState: LazyListState,
     resetScroll: () -> Unit = {}
@@ -43,22 +38,19 @@ fun MessagesContent(
             reverseLayout = true,
             state = scrollState,
             contentPadding = WindowInsets.statusBars.add(WindowInsets(top = 20.dp)).asPaddingValues(),
-            modifier = Modifier
-                .fillMaxSize()
+            modifier = Modifier.fillMaxSize()
         ) {
-            for (index in messages.indices) {
-                val content = messages[index]
-
+            messages.forEach { message ->
                 item {
                     Message(
-                        message = content,
-                        isUserMessage = content.isUserMessage,
-                        showTail = shouldShowMessageTail(messages, index)
+                        message = message.content,
+                        isUserMessage = message.isUserMessage,
+                        showTail = message.showMessageTail
                     )
                 }
-                if (shouldShowSectionTitle(messages, index)) {
+                if (message.showSectionTitle) {
                     item {
-                        Timestamp(content)
+                        Timestamp(message.dateFormatted)
                     }
                 }
             }
@@ -69,7 +61,8 @@ fun MessagesContent(
 
         val jumpToBottomButtonEnabled by remember {
             derivedStateOf {
-                scrollState.firstVisibleItemIndex != 0 || scrollState.firstVisibleItemScrollOffset > jumpThreshold
+                scrollState.firstVisibleItemIndex != 0
+                        || scrollState.firstVisibleItemScrollOffset > jumpThreshold
             }
         }
 
@@ -87,13 +80,13 @@ fun MessagesContent(
 
 // Show message date
 @Composable
-private fun Timestamp(message: Message) {
+private fun Timestamp(date: String) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.Center
     ) {
         Text(
-            text = dateFormatted(message.date),
+            text = date,
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -102,7 +95,7 @@ private fun Timestamp(message: Message) {
 
 @Composable
 private fun Message(
-    message: Message,
+    message: String,
     isUserMessage: Boolean,
     showTail: Boolean
 ) {
@@ -113,7 +106,7 @@ private fun Message(
 
 @Composable
 private fun ChatItemBubble(
-    message: Message,
+    message: String,
     isUserMessage: Boolean,
     showTail: Boolean
 ) {
@@ -123,7 +116,7 @@ private fun ChatItemBubble(
         MaterialTheme.colorScheme.surfaceVariant
     }
 
-    val shape = getBubbleShape(message.isUserMessage, showTail)
+    val shape = getBubbleShape(isUserMessage, showTail)
 
     Column(
         modifier = Modifier
@@ -142,7 +135,7 @@ private fun ChatItemBubble(
         ) {
             Box() {
                 Text(
-                    text = message.content,
+                    text = message,
                     style = MaterialTheme.typography.bodyLarge.copy(
                         color = if (isUserMessage) {
                             MaterialTheme.colorScheme.onPrimary
@@ -190,38 +183,6 @@ private fun getBubbleShape(isUserMessage: Boolean, showTail: Boolean): Shape {
         }
     } else {
         roundedCorners
-    }
-}
-
-// Returns message date with format “{day} {timestamp}” (Thursday 11:59).
-// If date is more than a week ago, format would be ”MMM d h:mm” (Jan 30 10:00)
-@Composable
-private fun dateFormatted(publishDate: Instant): String {
-    val pattern = if (isTheSameWeek(publishDate)) "EEEE h:mm" else "MMM d h:mm"
-    val zoneId by remember { mutableStateOf(ZoneId.systemDefault()) }
-
-    return DateTimeFormatter.ofPattern(pattern).withZone(zoneId).format(publishDate.toJavaInstant())
-}
-
-// Shows tail when any of the 3 criteria are met
-@VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-fun shouldShowMessageTail(messages: List<Message>, index: Int): Boolean {
-    val showTail = if (index == 0) {
-        true
-    } else {
-        isDifferenceInSecMore(messages[index - 1].date, messages[index].date, 20)
-                || (messages[index - 1].isUserMessage && !messages[index].isUserMessage)
-                || (!messages[index - 1].isUserMessage && messages[index].isUserMessage)
-    }
-    return showTail
-}
-
-@VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-fun shouldShowSectionTitle(messages: List<Message>, index: Int): Boolean {
-    return if (index < messages.size - 1) {
-        !isTheSameDay(messages[index + 1].date, messages[index].date)
-    } else {
-        true
     }
 }
 

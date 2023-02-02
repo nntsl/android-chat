@@ -1,4 +1,4 @@
-package com.nntsl.chat.core.testing.util
+package com.nntsl.chat.core.util
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi

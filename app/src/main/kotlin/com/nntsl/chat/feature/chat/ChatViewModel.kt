@@ -5,6 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.nntsl.chat.core.domain.GetMessagesUseCase
 import com.nntsl.chat.core.domain.SendMessageUseCase
 import com.nntsl.chat.core.model.Message
+import com.nntsl.chat.feature.chat.model.MessageScreenItem
+import com.nntsl.chat.feature.chat.model.mapToMessageScreenItems
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -22,7 +24,7 @@ class ChatViewModel @Inject constructor(
     val chatUiState: StateFlow<ChatUiState> =
         getMessagesUseCase()
             .map {
-                ChatUiState.Success(isLoading = false, messages = it)
+                ChatUiState.Success(isLoading = false, messages = it.mapToMessageScreenItems())
             }
             .stateIn(
                 scope = viewModelScope,
@@ -39,9 +41,9 @@ class ChatViewModel @Inject constructor(
 
 sealed interface ChatUiState {
     val isLoading: Boolean
-    val messages: List<Message>
+    val messages: List<MessageScreenItem>
 
-    data class Success(override val isLoading: Boolean, override val messages: List<Message>) : ChatUiState
+    data class Success(override val isLoading: Boolean, override val messages: List<MessageScreenItem>) : ChatUiState
 
-    data class NoData(override val isLoading: Boolean, override val messages: List<Message>) : ChatUiState
+    data class NoData(override val isLoading: Boolean, override val messages: List<MessageScreenItem>) : ChatUiState
 }

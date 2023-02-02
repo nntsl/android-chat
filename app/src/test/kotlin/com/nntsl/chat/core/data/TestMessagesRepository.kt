@@ -1,6 +1,6 @@
-package com.nntsl.chat.core.testing
+package com.nntsl.chat.core.data
 
-import com.nntsl.chat.core.data.MessagesRepository
+import com.nntsl.chat.core.datainfrustructure.MessagesRepository
 import com.nntsl.chat.core.model.Message
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow

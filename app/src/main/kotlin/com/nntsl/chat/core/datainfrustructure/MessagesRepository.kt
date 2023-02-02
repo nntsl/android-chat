@@ -1,4 +1,4 @@
-package com.nntsl.chat.core.data
+package com.nntsl.chat.core.datainfrustructure
 
 import com.nntsl.chat.core.model.Message
 import kotlinx.coroutines.flow.Flow
